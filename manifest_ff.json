@@ -1,0 +1,52 @@
+{
+  "manifest_version": 2,
+  "name": "VN Proxy Manager",
+  "version": "1.0.2",
+  "description": "Tự động mua, gia hạn và áp dụng proxy theo site đã chọn",
+
+  "permissions": [
+    "proxy",
+    "storage",
+    "notifications",
+    "webRequest",
+    "webRequestBlocking",
+    "<all_urls>"
+  ],
+
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": true
+  },
+
+  "browser_action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "VN Proxy Manager",
+    "default_icon": {
+      "48": "icons/icon48.png",
+      "96": "icons/icon96.png"
+    }
+  },
+
+  "options_ui": {
+    "page": "options/options.html",
+    "open_in_tab": true
+  },
+
+  "icons": {
+    "48": "icons/icon48.png",
+    "96": "icons/icon96.png"
+  },
+
+  "web_accessible_resources": ["error.html", "error.js"],
+
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "vnproxy@local",
+      "strict_min_version": "142.0",
+      "data_collection_permissions": {
+        "required": ["none"],
+        "optional": []
+      }
+    }
+  }
+}

@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>VN Proxy Manager – Cài đặt</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; background: #111827; color: #d1d5db; min-height: 100vh; }
+    header { background: #1f2937; padding: 14px 32px; border-bottom: 1px solid #374151; display: flex; align-items: center; gap: 12px; }
+    header h1 { font-size: 17px; color: #f9fafb; font-weight: 700; }
+    header .sub { font-size: 12px; color: #6b7280; }
+    .container { max-width: 820px; margin: 0 auto; padding: 24px 32px; }
+    .tabs { display: flex; gap: 2px; border-bottom: 1px solid #374151; margin-bottom: 24px; }
+    .tab { padding: 9px 18px; cursor: pointer; border-bottom: 2px solid transparent; color: #9ca3af; font-size: 13px; font-weight: 500; }
+    .tab:hover { color: #d1d5db; }
+    .tab.active { color: #e94560; border-bottom-color: #e94560; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    .card { background: #1f2937; border: 1px solid #374151; border-radius: 10px; padding: 20px; margin-bottom: 16px; }
+    .card h2 { font-size: 12px; font-weight: 600; color: #f9fafb; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid #374151; text-transform: uppercase; letter-spacing: 0.5px; }
+    .field { margin-bottom: 14px; }
+    .field:last-child { margin-bottom: 0; }
+    label { display: block; font-size: 12px; color: #9ca3af; margin-bottom: 5px; font-weight: 500; }
+    input[type="text"], input[type="password"], input[type="number"], input[type="datetime-local"], select {
+      width: 100%; background: #111827; border: 1px solid #374151; border-radius: 6px; padding: 8px 12px; color: #d1d5db; font-size: 13px; font-family: inherit; outline: none;
+    }
+    input:focus, select:focus { border-color: #e94560; }
+    select option { background: #1f2937; }
+    .hint { font-size: 11px; color: #6b7280; margin-top: 4px; line-height: 1.4; }
+    .hint code { background: #374151; padding: 1px 4px; border-radius: 3px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+    .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; }
+    .toggle-info .lbl { font-size: 13px; color: #d1d5db; }
+    .toggle-info .desc { font-size: 11px; color: #6b7280; margin-top: 2px; }
+    input[type="checkbox"] { width: 40px; height: 22px; appearance: none; background: #374151; border-radius: 11px; cursor: pointer; position: relative; transition: background 0.2s; flex-shrink: 0; }
+    input[type="checkbox"]:checked { background: #e94560; }
+    input[type="checkbox"]::after { content: ''; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; background: #fff; border-radius: 50%; transition: left 0.2s; }
+    input[type="checkbox"]:checked::after { left: 21px; }
+    .save-row { display: flex; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
+    button.btn { padding: 8px 18px; border: none; border-radius: 7px; font-size: 13px; font-weight: 600; cursor: pointer; transition: opacity 0.15s; }
+    button.btn:hover { opacity: 0.85; }
+    button.btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .btn-primary   { background: #e94560; color: #fff; }
+    .btn-secondary { background: #374151; color: #d1d5db; }
+    .btn-green     { background: #065f46; color: #6ee7b7; }
+    .btn-blue      { background: #1e3a5f; color: #60a5fa; }
+    .btn-danger    { background: #7f1d1d; color: #fca5a5; }
+    .btn-sm        { padding: 5px 12px; font-size: 12px; }
+
+    /* Proxy status */
+    .proxy-status-box { background: #0f1b2d; border: 1px solid #1e3a5f; border-radius: 8px; padding: 16px; }
+    .countdown-lg { font-size: 32px; font-weight: 700; color: #4ade80; }
+    .countdown-lg.warn { color: #fb923c; }
+    .countdown-lg.expired { color: #f87171; }
+    .countdown-lg.none { color: #4b5563; font-size: 16px; font-weight: 400; }
+    .info-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 12px; }
+    .info-row .k { color: #6b7280; }
+    .info-row .v { font-family: monospace; color: #d1d5db; }
+
+    /* Proxy table */
+    .proxy-table { width: 100%; border-collapse: collapse; font-size: 12px; font-family: monospace; }
+    .proxy-table th { text-align: left; padding: 6px 8px; color: #6b7280; border-bottom: 1px solid #374151; font-family: sans-serif; font-size: 11px; text-transform: uppercase; font-weight: 500; }
+    .proxy-table td { padding: 7px 8px; border-bottom: 1px solid #1f2937; color: #d1d5db; }
+    .proxy-table tr:hover td { background: #1f2937; }
+    .tag { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-family: sans-serif; }
+    .tag-http   { background: #1e3a5f; color: #60a5fa; }
+    .tag-socks5 { background: #1e4036; color: #34d399; }
+    .tag-ok     { background: #0b5e2f; color: #4ade80; }
+    .tag-exp    { background: #5e0b0b; color: #f87171; }
+/* Groups */
+    .groups-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .groups-toolbar h2 { font-size: 14px; color: #f9fafb; font-weight: 600; }
+    .group-card { background: #1f2937; border: 1px solid #374151; border-radius: 10px; margin-bottom: 10px; }
+    .group-card.disabled { opacity: 0.5; }
+    .group-row { display: flex; align-items: center; gap: 10px; padding: 12px 16px; }
+    .group-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .group-name-text { font-weight: 600; font-size: 13px; color: #f9fafb; flex: 1; }
+    .group-sites-count { font-size: 11px; color: #6b7280; }
+    .group-actions-row { display: flex; gap: 6px; }
+    .sites-list { background: #111827; border: 1px solid #374151; border-radius: 6px; padding: 6px; max-height: 150px; overflow-y: auto; margin-bottom: 8px; min-height: 38px; }
+    .site-item { display: flex; align-items: center; justify-content: space-between; padding: 4px 8px; border-radius: 4px; }
+    .site-item:hover { background: #1f2937; }
+    .site-name { font-size: 12px; font-family: monospace; color: #d1d5db; }
+    .site-del { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 15px; padding: 0 4px; }
+    .add-site-row { display: flex; gap: 8px; }
+    .add-site-row input { flex: 1; }
+    .color-picker { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+    .color-swatch { width: 22px; height: 22px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: border-color 0.15s; }
+    .color-swatch.selected { border-color: #fff; }
+
+    /* Tree – single unified container */
+    #groupTree:not(:empty) {
+      background: #1f2937; border: 1px solid #374151;
+      border-radius: 10px; overflow: hidden;
+    }
+    .tree-group { border-bottom: 1px solid #263346; position: relative; }
+    .tree-group:last-child { border-bottom: none; }
+    .tree-group.drag-over  { background: #1e3a5f22; }
+    /* Group reorder indicators */
+    .tree-group.gdrop-before::before,
+    .tree-group.gdrop-after::after {
+      content: ''; position: absolute; left: 0; right: 0;
+      height: 2px; background: #3b82f6; z-index: 10;
+    }
+    .tree-group.gdrop-before::before { top: 0; }
+    .tree-group.gdrop-after::after   { bottom: -1px; }
+    /* Group drag handle */
+    .g-handle { color: #374151; font-size: 14px; cursor: grab; flex-shrink: 0; padding: 0 2px; line-height: 1; }
+    .g-handle:hover { color: #6b7280; }
+    .tree-group.g-dragging { opacity: 0.4; }
+
+    .tree-hdr {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 14px; cursor: pointer; user-select: none;
+    }
+    .tree-hdr:hover { background: #263346; }
+    .chevron { font-size: 10px; color: #6b7280; width: 12px; flex-shrink: 0; transition: transform 0.15s; }
+    .chevron.open { transform: rotate(90deg); }
+    .g-name-text {
+      flex: 1; font-size: 13px; font-weight: 600; color: #f9fafb; min-width: 0;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .g-name-input {
+      flex: 1; background: #111827; border: 1px solid #e94560; border-radius: 5px;
+      outline: none; color: #f9fafb; font-size: 13px; font-weight: 600;
+      font-family: inherit; padding: 2px 7px; min-width: 0; display: none;
+    }
+    .g-cnt { font-size: 11px; color: #6b7280; flex-shrink: 0; min-width: 20px; text-align: right; }
+    .g-edit { background: none; border: none; color: #6b7280; cursor: pointer; font-size: 12px; padding: 2px 5px; flex-shrink: 0; }
+    .g-edit:hover { color: #d1d5db; }
+    .g-del  { background: none; border: none; color: #4b5563; cursor: pointer; font-size: 17px; padding: 0 2px; flex-shrink: 0; line-height: 1; }
+    .g-del:hover { color: #f87171; }
+
+    .tree-body {
+      padding: 2px 0 8px 36px;
+      border-top: 1px solid #1a2535;
+    }
+    .tree-body.drop-target { background: #1e3a5f22; }
+
+    .tree-url {
+      display: flex; align-items: center; gap: 6px;
+      padding: 4px 14px 4px 0; cursor: grab;
+      border-radius: 4px; position: relative;
+      transition: background 0.1s;
+    }
+    .tree-url:hover { background: #1a2535; }
+    .tree-url.dragging { opacity: 0.35; }
+    .tree-url.drop-before::before,
+    .tree-url.drop-after::after  {
+      content: ''; position: absolute; left: 0; right: 0; height: 2px;
+      background: #3b82f6; border-radius: 1px;
+    }
+    .tree-url.drop-before::before { top: -1px; }
+    .tree-url.drop-after::after   { bottom: -1px; }
+    .drag-handle { color: #374151; font-size: 14px; flex-shrink: 0; cursor: grab; line-height: 1; }
+    .tree-url:hover .drag-handle { color: #6b7280; }
+    .url-txt { font-size: 12px; font-family: monospace; color: #9ca3af; flex: 1; min-width: 0; }
+    .url-del { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 13px; padding: 0 2px; opacity: 0; transition: opacity 0.1s; flex-shrink: 0; }
+    .tree-url:hover .url-del { opacity: 1; }
+    .g-empty { font-size: 11px; color: #374151; padding: 4px 0; font-style: italic; }
+
+    input[type="text"]:focus { border-color: #e94560; }
+
+    /* Autocomplete dropdown */
+    .ac-wrap { position: relative; }
+    .ac-dropdown {
+      position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 50;
+      background: #1f2937; border: 1px solid #374151; border-radius: 8px;
+      box-shadow: 0 8px 24px #00000088; overflow: hidden; display: none;
+    }
+    .ac-dropdown.show { display: block; }
+    .ac-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 14px; cursor: pointer; font-size: 13px; color: #d1d5db;
+    }
+    .ac-item:hover, .ac-item.active { background: #263346; }
+    .ac-item .ac-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .ac-item .ac-name { flex: 1; font-weight: 500; }
+    .ac-item .ac-count { font-size: 11px; color: #6b7280; }
+    .ac-create { color: #e94560; font-style: italic; }
+
+    .empty-msg { color: #6b7280; font-size: 12px; padding: 10px; text-align: center; }
+    .error-msg { background: #3b0b0b; border: 1px solid #7f1d1d; border-radius: 6px; padding: 10px 14px; font-size: 12px; color: #f87171; margin-bottom: 12px; display: none; }
+    .toast { position: fixed; bottom: 24px; right: 24px; background: #1f2937; border: 1px solid #374151; border-radius: 8px; padding: 12px 18px; font-size: 13px; color: #d1d5db; max-width: 340px; box-shadow: 0 4px 20px #00000088; opacity: 0; transform: translateY(10px); transition: all 0.25s; pointer-events: none; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.success { border-color: #065f46; color: #6ee7b7; }
+    .toast.error   { border-color: #7f1d1d; color: #fca5a5; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>VN Proxy Manager</h1>
+    <span class="sub">Proxy Manager</span>
+  </header>
+  <div class="container">
+    <div class="tabs">
+      <div class="tab active" data-tab="proxy">Status</div>
+      <div class="tab" data-tab="groups">URLs</div>
+      <div class="tab" data-tab="account">Tài khoản proxy</div>
+    </div>
+
+    <!-- Proxy -->
+    <div class="tab-panel active" id="tab-proxy">
+      <div class="card">
+        <h2>Trạng thái proxy</h2>
+        <div class="proxy-status-box" style="margin-bottom:16px">
+          <div class="countdown-lg none" id="countdown">—</div>
+          <div style="font-size:11px;color:#6b7280;margin-bottom:12px" id="expiryLabel"></div>
+          <div class="info-row"><span class="k">Host:Port</span><span class="v" id="stAddr">—</span></div>
+          <div class="info-row"><span class="k">Giao thức</span><span class="v" id="stType">—</span></div>
+          <div class="info-row"><span class="k">Proxy ID</span><span class="v" id="stId">—</span></div>
+          <div class="info-row"><span class="k">Hết hạn</span><span class="v" id="stExpiry">—</span></div>
+          <div class="info-row" style="margin-top:6px">
+            <span class="k">IP qua proxy</span>
+            <span class="v" style="display:flex;align-items:center;gap:8px">
+              <span id="stProxyIp">—</span>
+              <button class="btn btn-secondary btn-sm" id="btnCheckIp" style="padding:2px 10px;font-size:11px">Kiểm tra</button>
+            </span>
+          </div>
+        </div>
+        <div id="proxyError" class="error-msg"></div>
+        <div class="save-row" style="margin-top:0">
+          <button class="btn btn-primary" id="btnBuy">Mua proxy mới</button>
+          <button class="btn btn-blue" id="btnRenew">Gia hạn</button>
+          <button class="btn btn-danger" id="btnClear">Xóa</button>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Chọn từ tài khoản (<span id="proxyCountLabel">—</span>)</h2>
+        <div id="proxyTableWrap"><div class="empty-msg">Nhấn "Tải" để load proxy từ mọi đơn hàng</div></div>
+        <div class="save-row">
+          <button class="btn btn-secondary" id="btnLoadAll">Tải tất cả đơn hàng</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Groups -->
+    <div class="tab-panel" id="tab-groups">
+      <div style="margin-bottom:14px" class="ac-wrap">
+        <input type="text" id="treeInput"
+          placeholder="shopee.vn, lazada.vn  hoặc  @Netflix:netflix.com, nflxvideo.net"
+          style="width:100%;padding:10px 14px;font-size:13px;background:#1f2937;border:1px solid #374151;border-radius:8px;color:#d1d5db;outline:none"
+          autocomplete="off"
+        />
+        <div class="ac-dropdown" id="acDropdown"></div>
+        <div class="hint" style="margin-top:6px">
+          Gõ <code>@</code> để chọn group. Không có <code>@group</code> → group đầu tiên.
+          URL trùng tự chuyển sang group mới nhất.
+        </div>
+      </div>
+      <div id="groupTree"></div>
+    </div>
+
+    <!-- Account + Purchase (merged) -->
+    <div class="tab-panel" id="tab-account">
+      <div class="card">
+        <h2>Cấu hình API</h2>
+        <div class="field">
+          <label>API URL</label>
+          <input type="text" id="apiUrl" placeholder="https://..." />
+        </div>
+        <div class="field">
+          <label>API Key</label>
+          <input type="password" id="apiKey" placeholder="API key" />
+        </div>
+        <div class="save-row" style="margin-top:14px">
+          <button class="btn btn-primary" id="saveAccount">Lưu</button>
+          <button class="btn btn-secondary" id="verifyKey">Xác minh</button>
+        </div>
+        <div id="verifyResult" style="margin-top:10px;font-size:12px;display:none"></div>
+      </div>
+
+      <div class="card">
+        <h2>Cài đặt mua proxy</h2>
+        <div class="grid-2">
+          <div class="field">
+            <label>Loại proxy</label>
+            <select id="loaiproxy">
+              <optgroup label="── Private ──">
+                <option value="Viettel">Viettel</option>
+                <option value="VNPT_Private">VNPT Private</option>
+                <option value="FPT">FPT</option>
+                <option value="VN_Private">VN Private</option>
+                <option value="4G_Private">4G Private</option>
+                <option value="US_Private">US Private</option>
+                <option value="US_ISP">US ISP</option>
+                <option value="VN_ISP">VN ISP</option>
+              </optgroup>
+              <optgroup label="── Pro ──">
+                <option value="Viettel_Pro">Viettel Pro</option>
+                <option value="VNPT_Pro">VNPT Pro</option>
+                <option value="FPT_Pro">FPT Pro</option>
+                <option value="VN">VN</option>
+                <option value="US">US</option>
+              </optgroup>
+              <optgroup label="── VIP ──">
+                <option value="VN_Vip">VN VIP</option>
+                <option value="US_Vip">US VIP</option>
+              </optgroup>
+              <optgroup label="── Basic ──">
+                <option value="Dan_Cu_Basic">Dân cư Basic</option>
+                <option value="Vn_Basic">VN Basic</option>
+                <option value="Us_Basic">US Basic</option>
+              </optgroup>
+              <optgroup label="── Xoay ──">
+                <option value="Vn_Xoay_Key">VN Xoay Key</option>
+                <option value="Vn_Xoay_Port">VN Xoay Port</option>
+                <option value="4G_Xoay_Port">4G Xoay Port</option>
+                <option value="Us_Xoay_Port">US Xoay Port</option>
+              </optgroup>
+            </select>
+          </div>
+          <div class="field">
+            <label>Giao thức</label>
+            <select id="proxyType">
+              <option value="HTTP">HTTP</option>
+              <option value="SOCKS5">SOCKS5</option>
+            </select>
+            <div class="hint">Chrome/Brave: dùng <strong style="color:#d1d5db">HTTP</strong> — SOCKS5 có auth không hoạt động trên Chromium.</div>
+          </div>
+        </div>
+        <div class="grid-3">
+          <div class="field">
+            <label>Số ngày</label>
+            <input type="number" id="ngay" min="1" max="365" value="1" />
+          </div>
+          <div class="field">
+            <label>Username proxy</label>
+            <input type="text" id="proxytk" />
+          </div>
+          <div class="field">
+            <label>Password proxy</label>
+            <input type="text" id="proxymk" />
+          </div>
+        </div>
+        <div class="save-row">
+          <button class="btn btn-primary" id="savePurchase">Lưu</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Modal: valid proxies found before buying -->
+  <div id="validProxiesModal" style="display:none;position:fixed;inset:0;background:#00000099;z-index:200;overflow-y:auto">
+    <div style="max-width:640px;margin:48px auto;padding:20px">
+      <div style="background:#1f2937;border:1px solid #f59e0b;border-radius:12px;overflow:hidden">
+        <div style="padding:16px 20px;border-bottom:1px solid #374151;display:flex;align-items:center;gap:10px">
+          <span style="font-size:20px">⚠</span>
+          <h2 style="font-size:15px;color:#fbbf24;flex:1" id="validProxiesTitle">Còn proxy chưa hết hạn</h2>
+        </div>
+        <div style="padding:16px 20px">
+          <p style="font-size:13px;color:#d1d5db;margin-bottom:14px">
+            Tài khoản còn proxy chưa hết hạn. Bạn có thể chọn dùng proxy có sẵn thay vì mua mới.
+          </p>
+          <div id="validProxiesTable" style="margin-bottom:16px"></div>
+          <div style="display:flex;gap:10px;justify-content:flex-end">
+            <button class="btn btn-secondary" id="btnCancelBuy">Huỷ</button>
+            <button class="btn btn-primary" id="btnProceedBuy">Tiếp tục mua mới</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="../polyfill.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>
