@@ -657,6 +657,69 @@ function initTreeInput() {
   input.addEventListener('blur', () => setTimeout(hideAc, 150));
 }
 
+// ─── Export / Import ─────────────────────────────────────────────────────────
+
+document.getElementById('btnExport').addEventListener('click', () => {
+  const data = JSON.stringify(groups.map(g => ({ name: g.name, sites: g.sites })), null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url;
+  a.download = 'vnproxy-urls.json';
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+document.getElementById('importFile').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  e.target.value = '';
+
+  let imported;
+  try {
+    imported = JSON.parse(await file.text());
+    if (!Array.isArray(imported)) throw new Error('Không phải array');
+  } catch (err) {
+    showToast('File không hợp lệ: ' + err.message, 'error');
+    return;
+  }
+
+  // Merge: với mỗi group trong file, tìm group cùng tên hoặc tạo mới
+  let added = 0, merged = 0;
+  for (const imp of imported) {
+    if (!imp.name || !Array.isArray(imp.sites)) continue;
+    const sites = imp.sites.map(s =>
+      String(s).trim().toLowerCase().replace(/^https?:\/\//, '').split('/')[0]
+    ).filter(Boolean);
+    if (!sites.length) continue;
+
+    const existing = groups.find(g => g.name.toLowerCase() === imp.name.toLowerCase());
+    if (existing) {
+      // Merge vào group hiện có
+      sites.forEach(s => { if (!existing.sites.includes(s)) existing.sites.push(s); });
+      merged++;
+    } else {
+      // Tạo group mới
+      groups.push(newGroup(imp.name));
+      groups[groups.length - 1].sites = sites;
+      added++;
+    }
+  }
+
+  // Dedup toàn bộ (URL chỉ thuộc 1 group - group cuối cùng thắng)
+  const seen = new Set();
+  for (let i = groups.length - 1; i >= 0; i--) {
+    groups[i].sites = groups[i].sites.filter(s => {
+      if (seen.has(s)) return false;
+      seen.add(s); return true;
+    });
+  }
+
+  await send({ type: 'saveSettings', settings: { groups } });
+  renderTree();
+  showToast(`Import: ${added} group mới, ${merged} group được merge`);
+});
+
 // ─── Tab Account ──────────────────────────────────────────────────────────────
 
 document.getElementById('saveAccount').addEventListener('click', async () => {
