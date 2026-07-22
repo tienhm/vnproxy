@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>VN Proxy Manager</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; width: 280px; background: #111827; color: #e0e0e0; }
+
+    .header { background: #1f2937; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #374151; }
+    .header h1 { font-size: 13px; font-weight: 700; color: #f9fafb; }
+    .open-settings { font-size: 11px; color: #6b7280; cursor: pointer; text-decoration: none; }
+    .open-settings:hover { color: #d1d5db; }
+
+    .proxy-block { padding: 14px; border-bottom: 1px solid #1f2937; }
+    .proxy-block.none { text-align: center; padding: 20px 14px; }
+    .cd { font-size: 28px; font-weight: 700; color: #4ade80; line-height: 1.1; }
+    .cd.warn    { color: #fb923c; }
+    .cd.expired { color: #f87171; }
+    .cd.none    { color: #4b5563; font-size: 14px; font-weight: 400; }
+    .proxy-addr { font-size: 12px; font-family: monospace; color: #9ca3af; margin-top: 4px; }
+    .proto { background: #1e3a5f; color: #60a5fa; font-size: 10px; padding: 1px 5px; border-radius: 4px; margin-left: 4px; }
+    .proxy-ip { font-size: 11px; font-family: monospace; color: #4ade80; margin-top: 3px; }
+    .expiry { font-size: 10px; color: #6b7280; margin-top: 2px; }
+    .sub { font-size: 11px; color: #6b7280; margin-top: 6px; }
+
+.groups-section { padding: 10px 14px 14px; }
+    .groups-title { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: #6b7280; margin-bottom: 8px; }
+    .group-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; }
+    .group-item.off { opacity: 0.4; }
+    .gdot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .gname { font-size: 12px; color: #d1d5db; flex: 1; }
+    .gsites { font-size: 10px; color: #6b7280; }
+    .no-groups { font-size: 11px; color: #6b7280; padding: 4px 0; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>VN Proxy Manager</h1>
+    <a href="#" class="open-settings" id="openSettings">⚙ Cài đặt</a>
+  </div>
+  <div id="content"></div>
+  <script src="../polyfill.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
