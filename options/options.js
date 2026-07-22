@@ -659,15 +659,25 @@ function initTreeInput() {
 
 // ─── Export / Import ─────────────────────────────────────────────────────────
 
-document.getElementById('btnExport').addEventListener('click', () => {
-  const data = JSON.stringify(groups.map(g => ({ name: g.name, sites: g.sites })), null, 2);
-  const blob = new Blob([data], { type: 'application/json' });
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  a.href = url;
-  a.download = 'vnproxy-urls.json';
-  a.click();
+async function sha256(str) {
+  const buf  = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+document.getElementById('btnExport').addEventListener('click', async () => {
+  const payload = groups.map(g => ({ name: g.name, sites: g.sites }));
+  const body    = JSON.stringify(payload);
+  const sig     = await sha256(body);
+  const output  = JSON.stringify({ _app: 'vnproxy', _sig: sig, groups: payload }, null, 2);
+  const blob    = new Blob([output], { type: 'application/json' });
+  const url     = URL.createObjectURL(blob);
+  const a       = document.createElement('a');
+  a.href = url; a.download = 'vnproxy-urls.json'; a.click();
   URL.revokeObjectURL(url);
+});
+
+document.getElementById('btnImport').addEventListener('click', () => {
+  document.getElementById('importFile').click();
 });
 
 document.getElementById('importFile').addEventListener('change', async (e) => {
@@ -675,14 +685,26 @@ document.getElementById('importFile').addEventListener('change', async (e) => {
   if (!file) return;
   e.target.value = '';
 
-  let imported;
+  let parsed;
   try {
-    imported = JSON.parse(await file.text());
-    if (!Array.isArray(imported)) throw new Error('Không phải array');
+    parsed = JSON.parse(await file.text());
   } catch (err) {
     showToast('File không hợp lệ: ' + err.message, 'error');
     return;
   }
+
+  // Verify signature
+  if (!parsed._app || parsed._app !== 'vnproxy' || !parsed._sig || !Array.isArray(parsed.groups)) {
+    showToast('File không được tạo từ extension này', 'error');
+    return;
+  }
+  const expected = await sha256(JSON.stringify(parsed.groups));
+  if (expected !== parsed._sig) {
+    showToast('Checksum không khớp — file bị chỉnh sửa hoặc không hợp lệ', 'error');
+    return;
+  }
+
+  const imported = parsed.groups;
 
   // Merge: với mỗi group trong file, tìm group cùng tên hoặc tạo mới
   let added = 0, merged = 0;
