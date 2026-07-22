@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "VN Proxy Manager",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Tự động mua, gia hạn và áp dụng proxy theo site đã chọn",
 
   "permissions": [
